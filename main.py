@@ -17,7 +17,6 @@ try:
 except Exception as e:
     print("[TEST FAIL] ImageMagick still not found:")
     print(e)
-    print("Please verify path and restart terminal/VS Code")
     raise
 
 # Now safe to import everything else
@@ -34,29 +33,63 @@ from image_fetch import fetch_images
 from video_compose import make_short_video
 from uploader import upload_video
 
+
 def main():
     parser = argparse.ArgumentParser(description="YouTube Shorts Generator")
     parser.add_argument("--json", default="data.json", help="Input JSON file")
-    parser.add_argument("--upload", action="store_true", help="Upload after creation (still asks for confirmation)")
+    parser.add_argument("--upload", action="store_true", help="Upload after creation")
     args = parser.parse_args()
 
     print(f"[START] Processing JSON: {args.json}")
     data = parse_input(args.json)
 
+    # Generate timestamped filename
+    now = datetime.datetime.now()
+    timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")
+    output_path = f"output/final_short_{timestamp}.mp4"
+
+    # ----------------------------------------------------------
+    # CHECK IF FILE EXISTS
+    # ----------------------------------------------------------
+    if os.path.exists(output_path):
+        print("\nExisting video detected:")
+        print(output_path)
+        print("\nChoose an option:")
+        print("  1 = Upload existing video")
+        print("  2 = Recreate video and upload")
+        print("  3 = Skip and exit")
+
+        choice = input("Your choice (1/2/3): ").strip()
+
+        if choice == "1":
+            meta = data["metadata"]
+            print("→ Uploading existing video...")
+            upload_video(
+                video_path=output_path,
+                title=meta["title"],
+                description=meta["description"],
+                tags=meta.get("tags", [])
+            )
+            return
+
+        elif choice == "3":
+            print("Skipped.")
+            return
+
+        # If option 2 → continue and recreate
+
+    # ----------------------------------------------------------
+    # CREATE VIDEO
+    # ----------------------------------------------------------
     print("→ Building script...")
     english = build_english_script(data)
-    hindi   = translate_to_hindi(english)
+    hindi = translate_to_hindi(english)
 
     print("→ Generating audio...")
     audio_file = generate_audio(hindi)
 
     print("→ Fetching images...")
     images = fetch_images(data)
-
-    # Generate timestamped filename
-    now = datetime.datetime.now()
-    timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")
-    output_path = f"output/final_short_{timestamp}.mp4"
 
     print(f"[INFO] Video will be saved as: {output_path}")
 
@@ -72,37 +105,40 @@ def main():
 
     print(f"[SUCCESS] Video created: {video_path}")
 
-    # Preview: open in default player
+    # ----------------------------------------------------------
+    # PREVIEW
+    # ----------------------------------------------------------
     print("[PREVIEW] Opening video for review...")
     try:
-        os.startfile(video_path)
+        os.startfile(os.path.abspath(video_path))
     except Exception as e:
         print(f"[WARNING] Auto-open failed: {e}")
         print("Please open manually: " + str(Path(video_path).resolve()))
 
-    # Upload approval
-    print("\n" + "-"*60)
-    print("Video is ready. Do you want to upload it to YouTube?")
-    print("  y = yes, upload now")
-    print("  n = no, exit")
-    print("-"*60)
+    # ----------------------------------------------------------
+    # UPLOAD CONFIRMATION
+    # ----------------------------------------------------------
+    print("\n" + "-" * 60)
+    print("Video is ready. Do you want to upload it?")
+    print("  y = yes")
+    print("  n = no")
+    print("-" * 60)
 
     choice = input("Your choice (y/n): ").strip().lower()
+
     if choice in ['y', 'yes']:
-        print("→ Starting YouTube upload...")
         meta = data["metadata"]
-        try:
-            upload_video(
-                video_path=video_path,
-                title=meta["title"],
-                description=meta["description"],
-                tags=meta.get("tags", [])
-            )
-            print("[UPLOAD] Process completed.")
-        except Exception as e:
-            print(f"[UPLOAD ERROR] {e}")
+        print("→ Starting YouTube upload...")
+        upload_video(
+            video_path=video_path,
+            title=meta["title"],
+            description=meta["description"],
+            tags=meta.get("tags", [])
+        )
+        print("[UPLOAD] Process completed.")
     else:
         print("Upload skipped. Video is saved at:", video_path)
+
 
 if __name__ == "__main__":
     main()

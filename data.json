@@ -1,35 +1,20 @@
 {
   "day": "Monday",
   "date": "2026-02-23",
-  "location": "San Francisco, USA",
-  "type": "AI_Gadgets",
-  "news_type": "Technology",
-  "channel": "SpaceMind_AI",
-  "headline": "GPT-6 Early Preview: AGI is Coming!",
-  "hook_text": "The wait is over! OpenAI just dropped a bombshell preview of GPT-6, and it’s smarter than we ever imagined!",
-  "details": "OpenAI has officially teased GPT-6, showcasing a revolutionary 'Cognitive Memory' system. Unlike previous models, GPT-6 remembers your personal preferences across every single session, acting as a true digital partner. It features human-level reasoning and can process live video and audio with zero lag. Experts suggest this is the final step toward AGI. The model even adapts its emotional tone to match yours. This isn't just a chatbot anymore; it's a full-scale AI collaborator that understands context better than any previous system. The future of artificial intelligence has officially arrived!",
-  "subscribe_hook": "Are you ready to live with GPT-6? Subscribe to SpaceMind_AI to find out more and stay ahead of the AI revolution!",
+  "location": "Mumbai, India",
+  "type": "BollywoodNews",
+  "news_type": "Entertainment",
+  "channel": "TrendWave Now",
+  "headline": "Ranbir’s 2026 Mega Strategy!",
+  "hook_text": "Ranbir Kapoor is playing a high-stakes game with his 2026 releases! Can he rule the box office?",
+  "details": "Ranbir Kapoor is making a massive power move for 2026. He has reportedly asked Sanjay Leela Bhansali to move 'Love And War' to a June release. This ensures a clear window before his massive epic 'Ramayana' takes over Diwali. With music by Hans Zimmer and A.R. Rahman, 'Ramayana' is being built for a global audience. By spacing these two giants out, Ranbir aims to break every domestic record in a single calendar year. Bollywood insiders say this strategic gap is vital to maximize the hype for both blockbusters. It’s officially the Year of Ranbir!",
+  "subscribe_hook": "Which Ranbir film will be bigger: Love And War or Ramayana? Comment below and subscribe to find out more!",
   "metadata": {
-    "title": "GPT-6 FIRST LOOK! 🤖 OpenAI's AGI Breakthrough | SpaceMind_AI",
-    "description": "OpenAI unveils GPT-6 with persistent memory and real-time reasoning. Is AGI finally here? #GPT6 #OpenAI #AGI #SpaceMind_AI #TechNews",
-    "tags": [
-      "GPT-6",
-      "OpenAI",
-      "Artificial Intelligence",
-      "AGI",
-      "Sam Altman",
-      "AI News 2026",
-      "SpaceMind_AI"
-    ],
-    "search_key": "OpenAI GPT-6 features 2026 preview | GPT-6 vs GPT-5 comparison AGI",
+    "title": "Ranbir’s 2026 Plan! 🎬 Love & War vs Ramayana | TrendWave Now",
+    "description": "Ranbir Kapoor spaces out Love and War and Ramayana for a record-breaking 2026. #RanbirKapoor #LoveAndWar #Ramayana #BollywoodNews",
+    "tags": ["Ranbir Kapoor", "Ramayana 2026", "Love and War movie", "Bollywood"],
+    "search_key": "Ranbir Kapoor 2026 movies | Love and War vs Ramayana release dates",
     "aspect_ratio": "9:16_FILL",
-    "hashtags": [
-      "#GPT6",
-      "#OpenAI",
-      "#ArtificialIntelligence",
-      "#AGI",
-      "#SpaceMind_AI",
-      "#TechFuture"
-    ]
+    "hashtags": ["#RanbirKapoor", "#BollywoodUpdate", "#TrendWaveNow"]
   }
 }
