@@ -1,19 +1,35 @@
 {
   "day": "Monday",
   "date": "2026-02-23",
-  "location": "Ahmedabad, Gujarat",
-  "type": "CricketNews",
-  "news_type": "Sports",
-  "channel": "TrendWave Now",
-  "headline": "India's Shock Defeat: Streak Over!",
-  "hook_text": "Unbelievable! India's 12-match winning streak just went up in smoke in Ahmedabad!",
-  "details": "South Africa stunned the world today, crushing India by 76 runs. Despite a masterclass from Jasprit Bumrah, India’s batting order collapsed for a mere 111. David Miller’s brutal 63 made the difference. Now, India faces a do-or-die clash against Zimbabwe to stay in the World Cup. Fans are calling for Sanju Samson’s return to fix the top-order failure. Can King Kohli and the boys bounce back? The pressure is on!",
-  "subscribe_hook": "Is it time to drop the openers for Sanju? Comment below! Subscribe for the Zimbabwe playing XI updates!",
+  "location": "San Francisco, USA",
+  "type": "AI_Gadgets",
+  "news_type": "Technology",
+  "channel": "SpaceMind_AI",
+  "headline": "GPT-6 Early Preview: AGI is Coming!",
+  "hook_text": "The wait is over! OpenAI just dropped a bombshell preview of GPT-6, and it’s smarter than we ever imagined!",
+  "details": "OpenAI has officially teased GPT-6, showcasing a revolutionary 'Cognitive Memory' system. Unlike previous models, GPT-6 remembers your personal preferences across every single session, acting as a true digital partner. It features human-level reasoning and can process live video and audio with zero lag. Experts suggest this is the final step toward AGI. The model even adapts its emotional tone to match yours. This isn't just a chatbot anymore; it's a full-scale AI collaborator that understands context better than any previous system. The future of artificial intelligence has officially arrived!",
+  "subscribe_hook": "Are you ready to live with GPT-6? Subscribe to SpaceMind_AI to find out more and stay ahead of the AI revolution!",
   "metadata": {
-    "title": "India LOSE! 😱 Streak Broken by South Africa | TrendWave Now",
-    "description": "India's T20 World Cup winning streak ends at 12. South Africa wins by 76 runs. #INDvsSA #T20WorldCup #CricketNews #TrendWaveNow",
-    "tags": ["India vs South Africa", "T20 World Cup", "Bumrah", "Cricket Highlights"],
-    "search_key": "India vs South Africa 2026 highlights | David Miller 63 vs India | Sanju Samson return news",
-    "hashtags": ["#INDvsSA", "#T20WorldCup", "#CricketViral", "#TrendWaveNow"]
+    "title": "GPT-6 FIRST LOOK! 🤖 OpenAI's AGI Breakthrough | SpaceMind_AI",
+    "description": "OpenAI unveils GPT-6 with persistent memory and real-time reasoning. Is AGI finally here? #GPT6 #OpenAI #AGI #SpaceMind_AI #TechNews",
+    "tags": [
+      "GPT-6",
+      "OpenAI",
+      "Artificial Intelligence",
+      "AGI",
+      "Sam Altman",
+      "AI News 2026",
+      "SpaceMind_AI"
+    ],
+    "search_key": "OpenAI GPT-6 features 2026 preview | GPT-6 vs GPT-5 comparison AGI",
+    "aspect_ratio": "9:16_FILL",
+    "hashtags": [
+      "#GPT6",
+      "#OpenAI",
+      "#ArtificialIntelligence",
+      "#AGI",
+      "#SpaceMind_AI",
+      "#TechFuture"
+    ]
   }
 }
