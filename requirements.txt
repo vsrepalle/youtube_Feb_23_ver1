@@ -1,0 +1,9 @@
+googletrans==4.0.0-rc1
+gtts
+requests
+moviepy
+pydub
+SpeechRecognition
+google-api-python-client
+google-auth-oauthlib
+python-unsplash
