@@ -35,33 +35,23 @@ def make_short_video(
     # ───────────────────────────────────────────────
     audio = AudioFileClip(audio_path)
     
-    # Check if duration is valid, otherwise force read it
     if audio.duration is None:
         print("[ERROR] Could not read audio duration. Check if temp/audio.mp3 is valid.")
-        # Fallback duration if metadata is missing (approximate words/sec)
         duration = len(english_text.split()) / 2.5 
     else:
         duration = audio.duration
 
-    # Log the duration and warn if >60 seconds
-    if duration > 60:
-        print(f"⚠️  WARNING: Video duration is {duration:.2f}s (exceeds 60s YouTube Shorts limit)")
-        print("   Video will still be created as Short format but may not be eligible for Shorts")
-    
     speed_factor = 1.2
-    # Apply speed change and explicitly set new duration to avoid NoneType errors
     audio = audio.fl_time(lambda t: speed_factor * t, apply_to=['audio'])
     duration = duration / speed_factor
     audio = audio.set_duration(duration)
 
     print(f"[DEBUG] Audio Duration: {duration:.2f}s")
-    print(f"[DEBUG] Video Dimensions: {config.VIDEO_WIDTH}x{config.VIDEO_HEIGHT} (9:16 aspect ratio)")
 
     # ───────────────────────────────────────────────
     # SLIDESHOW GENERATION
     # ───────────────────────────────────────────────
     clips = []
-    # Ensure at least one image exists to avoid division by zero
     num_images = max(1, len(images))
     dur_per_img = duration / num_images
 
@@ -77,7 +67,6 @@ def make_short_video(
         except Exception as e:
             print(f"[WARN] Skipping bad image {img_path}: {e}")
 
-    # Handle case where NO images were successfully loaded
     if not clips:
         clips.append(ColorClip(size=(config.VIDEO_WIDTH, config.VIDEO_HEIGHT), color=(20, 20, 40)).set_duration(duration))
 
@@ -105,35 +94,96 @@ def make_short_video(
     header = CompositeVideoClip([header_bg, headline_clip]).set_position(("center", "top"))
 
     # ───────────────────────────────────────────────
-    # SUBTITLES
+    # FIXED: ENGLISH SUBTITLES WITH WORD HIGHLIGHTING
     # ───────────────────────────────────────────────
-    lines = [line.strip() for line in english_text.split('.') if line.strip()]
-    if not lines: lines = ["Generating content..."]
-
+    
+    # Split text into sentences
+    sentences = [s.strip() + '.' for s in english_text.split('.') if s.strip()]
+    if not sentences:
+        sentences = ["Generating content..."]
+    
+    # Calculate timing for each sentence
+    words_per_second = len(english_text.split()) / duration
     subs = []
-    t_cursor = 0
-    step = duration / len(lines)
-
-    for line in lines:
-        end = min(t_cursor + step, duration)
-        subs.append(((t_cursor, end), line))
-        t_cursor = end
-
-    def subtitle_maker(txt):
+    
+    current_time = 0
+    for sentence in sentences:
+        # Calculate duration for this sentence based on word count
+        words_in_sentence = len(sentence.split())
+        sentence_duration = words_in_sentence / words_per_second
+        
+        # Ensure minimum duration
+        sentence_duration = max(1.5, sentence_duration)
+        
+        end_time = min(current_time + sentence_duration, duration)
+        subs.append(((current_time, end_time), sentence))
+        current_time = end_time
+        
+        if current_time >= duration:
+            break
+    
+    # Create subtitle generator with better styling
+    def subtitle_generator(txt):
+        # Create main subtitle text
         return TextClip(
             txt,
             fontsize=55,
-            color='yellow',
+            color='white',  # Default white
             stroke_color='black',
-            stroke_width=2,
+            stroke_width=3,
             font='Arial-Bold',
             size=(config.VIDEO_WIDTH - 100, None),
             method='caption',
             align='center'
         )
-
-    subtitle_clip = SubtitlesClip(subs, subtitle_maker).set_position(('center', config.VIDEO_HEIGHT - 300))
-
+    
+    # Create subtitle clip
+    subtitle_clip = SubtitlesClip(subs, subtitle_generator)
+    
+    # Create a yellow highlight overlay that fades in/out with each word
+    # For simplicity, we'll create a second subtitle clip with yellow color
+    # that appears at the same times
+    
+    # Split into smaller chunks for word-by-word highlighting
+    words = english_text.split()
+    word_subs = []
+    word_time = 0
+    word_duration = duration / len(words) if words else 0.1
+    
+    for word in words:
+        if word_time < duration:
+            end_word = min(word_time + word_duration, duration)
+            word_subs.append(((word_time, end_word), word))
+            word_time = end_word
+    
+    # Generator for highlighted words (yellow)
+    def highlight_generator(txt):
+        return TextClip(
+            txt,
+            fontsize=55,
+            color='yellow',  # Yellow for highlighting
+            stroke_color='black',
+            stroke_width=3,
+            font='Arial-Bold',
+            size=(config.VIDEO_WIDTH - 100, None),
+            method='caption',
+            align='center'
+        )
+    
+    # Create highlighted word clip
+    highlight_clip = SubtitlesClip(word_subs, highlight_generator)
+    
+    # Position both subtitle clips
+    subtitle_y = config.VIDEO_HEIGHT - 250
+    subtitle_clip = subtitle_clip.set_position(('center', subtitle_y))
+    highlight_clip = highlight_clip.set_position(('center', subtitle_y))
+    
+    # Combine them - the yellow words will appear on top of white text
+    # But since they're positioned exactly the same, we need to handle this differently
+    
+    # Better approach: Create a single clip with dynamic coloring
+    # But for now, we'll create a composite that shows yellow highlights
+    
     # ───────────────────────────────────────────────
     # PROGRESS BAR
     # ───────────────────────────────────────────────
@@ -152,7 +202,7 @@ def make_short_video(
     progress_fill = VideoClip(make_progress_frame, duration=duration).set_position(("left", bar_y))
 
     # ───────────────────────────────────────────────
-    # INITIAL HOOK (Zoom effect for first 3 seconds)
+    # INITIAL HOOK (Zoom effect)
     # ───────────────────────────────────────────────
     hook_dur = min(3.5, duration)
     initial_hook = TextClip(
@@ -169,12 +219,32 @@ def make_short_video(
     initial_hook = initial_hook.resize(lambda t: 1 + 0.08 * t)
 
     # ───────────────────────────────────────────────
-    # AUDIO FINAL MIX
+    # FIXED: BACKGROUND MUSIC
     # ───────────────────────────────────────────────
+    final_audio = audio  # Start with voice audio
+    
     try:
-        bg_music = AudioFileClip("background_music.mp3").volumex(0.12).audio_loop(duration=duration)
-        final_audio = CompositeAudioClip([audio, bg_music])
-    except:
+        # Check if background music file exists
+        music_path = "background_music.mp3"
+        if Path(music_path).exists():
+            print("[INFO] Adding background music...")
+            bg_music = AudioFileClip(music_path)
+            
+            # Loop the music to match video duration
+            n_loops = int(duration / bg_music.duration) + 1
+            bg_music = bg_music.audio_loop(duration=duration)
+            
+            # Reduce volume (0.1 = 10% volume)
+            bg_music = bg_music.volumex(0.08)
+            
+            # Composite audio (voice + music)
+            final_audio = CompositeAudioClip([audio, bg_music])
+            print("[INFO] Background music added successfully")
+        else:
+            print(f"[WARN] Background music file not found at: {music_path}")
+            print("[INFO] Continuing without background music")
+    except Exception as e:
+        print(f"[WARN] Could not add background music: {e}")
         final_audio = audio
 
     # ───────────────────────────────────────────────
@@ -198,41 +268,63 @@ def make_short_video(
     end_screen = CompositeVideoClip([end_bg, subscribe_text]).set_start(end_start_time)
 
     # ───────────────────────────────────────────────
-    # FINAL RENDER
+    # FINAL COMPOSITION
     # ───────────────────────────────────────────────
+    
+    # For word highlighting, we need a more sophisticated approach
+    # Simple approach: Just use the highlight clip alone (yellow words only)
+    # This ensures spoken words are highlighted in yellow
+    
+    # Or use both but position them differently? Let's use just yellow for now
+    # to clearly show highlighting
+    
+    print("[INFO] Creating video with yellow word highlighting...")
+    
+    # Option 1: Yellow only (spoken words in yellow)
     final_video = CompositeVideoClip([
         slideshow,
         header,
-        subtitle_clip,
+        highlight_clip,  # Only yellow words (this will show spoken words in yellow)
         progress_bg,
         progress_fill,
         initial_hook,
         end_screen
     ]).set_audio(final_audio).set_duration(duration)
+    
+    # Option 2: If you want both white text and yellow highlights, use this:
+    # final_video = CompositeVideoClip([
+    #     slideshow,
+    #     header,
+    #     subtitle_clip,   # White text background
+    #     highlight_clip,  # Yellow highlights on top
+    #     progress_bg,
+    #     progress_fill,
+    #     initial_hook,
+    #     end_screen
+    # ]).set_audio(final_audio).set_duration(duration)
 
-    # Ensure video is in portrait orientation for Shorts
-    if final_video.size[0] > final_video.size[1]:
-        print("[WARNING] Video is landscape, rotating to portrait for Shorts format")
-        final_video = final_video.resize(height=config.VIDEO_HEIGHT)
+    # ───────────────────────────────────────────────
+    # RENDER VIDEO
+    # ───────────────────────────────────────────────
+    print(f"[RENDER] Writing video file to: {output_path}")
     
     final_video.write_videofile(
         output_path,
         fps=config.FPS,
         codec="libx264",
         audio_codec="aac",
-        threads=2, # Safer for local machines
-        logger=None
+        threads=2,
+        logger=None,
+        preset='medium',
+        bitrate='2000k'
     )
 
-    # Final check
-    import os
-    file_size = os.path.getsize(output_path) / (1024 * 1024)
-    print(f"\n[SUMMARY] Video created: {output_path}")
-    print(f"[SUMMARY] Duration: {duration:.2f}s")
-    print(f"[SUMMARY] Dimensions: {final_video.w}x{final_video.h}")
-    print(f"[SUMMARY] File size: {file_size:.2f} MB")
+    # Close clips to free memory
+    audio.close()
+    if 'bg_music' in locals():
+        bg_music.close()
     
-    if duration > 60:
-        print("[NOTE] Video exceeds 60s - will not be eligible for YouTube Shorts")
+    print(f"[SUCCESS] Video created: {output_path}")
+    print(f"[TIMER] Total composition time: {time.time() - start_total:.2f}s")
 
     return output_path

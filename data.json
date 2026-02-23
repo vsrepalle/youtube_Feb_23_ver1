@@ -2,19 +2,19 @@
   "day": "Monday",
   "date": "2026-02-23",
   "location": "Mumbai, India",
-  "type": "BollywoodNews",
-  "news_type": "Entertainment",
-  "channel": "TrendWave Now",
-  "headline": "Ranbir’s 2026 Mega Strategy!",
-  "hook_text": "Ranbir Kapoor is playing a high-stakes game for 2026! Can he rule the box office?",
-  "details": "Ranbir Kapoor is making a power move to dominate 2026. He’s reportedly requested Sanjay Leela Bhansali to release 'Love And War' in June. This creates a strategic gap before his massive epic 'Ramayana' takes over Diwali. Built for a global audience with music by Hans Zimmer and A.R. Rahman, 'Ramayana' is his biggest bet yet. By spacing these blockbusters out, Ranbir aims to break every domestic record in a single year. Bollywood insiders say this gap is vital to maximize hype for both films. It’s officially the Year of Ranbir!",
-  "subscribe_hook": "Love and War or Ramayana—which will be bigger? Subscribe to find out more!",
+  "type": "TechNews",
+  "news_type": "Artificial Intelligence",
+  "channel": "SpaceMind AI",
+  "headline": "AI Robot Dogs: India's New Guardians!",
+  "hook_text": "They don't bark, they don't bite—but their neural networks are watching you 24/7! India's AI robot dog revolution begins!",
+  "details": "India just joined the robotic future with AI-powered robot dogs patrolling public spaces. These mechanical canines run on advanced deep learning algorithms, detecting explosives and reading license plates from 100 meters away with 99.7% accuracy. Made by a Bengaluru-based AI startup, they're being tested at airports and metro stations. Unlike human officers, their AI never gets tired, never blinks, and processes millions of data points per second. The robots use reinforcement learning to improve their patrol patterns daily. Privacy activists are alarmed, but the government says the AI systems are trained only for crowd management and disaster response. With 360-degree computer vision and two-way neural voice synthesis, these robot dogs represent India's leap into AI-powered law enforcement.",
+  "subscribe_hook": "AI guardians or digital dictatorship? Subscribe to SpaceMind AI for weekly tech deep dives!",
   "metadata": {
-    "title": "Ranbir’s 2026 Plan! 🎬 Love & War vs Ramayana | TrendWave Now",
-    "description": "Ranbir Kapoor spaces out Love and War and Ramayana for a record-breaking 2026. #RanbirKapoor #LoveAndWar #Ramayana #BollywoodNews",
-    "tags": ["Ranbir Kapoor", "Ramayana 2026", "Love and War movie", "Bollywood"],
-    "search_key": "Ranbir Kapoor 2026 movies | Love and War vs Ramayana release dates",
+    "title": "AI Robot Dogs Are Here! 🤖🐕 Neural Networks on Patrol | SpaceMind AI",
+    "description": "India's first AI neural network-powered robot dogs are now on duty. See how machine learning is transforming public safety! #AI #NeuralNetworks #Robotics #SpaceMindAI",
+    "tags": ["AI Robot Dogs", "Neural Networks India", "Deep Learning Robotics", "Artificial Intelligence Surveillance", "Machine Learning Applications", "Computer Vision India", "AI Law Enforcement"],
+    "search_key": "AI robot dogs India deployment 2026 | Neural network police dogs Mumbai | SpaceMind AI",
     "aspect_ratio": "9:16_FILL",
-    "hashtags": ["#RanbirKapoor", "#BollywoodUpdate", "#TrendWaveNow"]
+    "hashtags": ["#AI", "#NeuralNetworks", "#DeepLearning", "#RobotDogs", "#FutureOfAI", "#SpaceMindAI"]
   }
 }

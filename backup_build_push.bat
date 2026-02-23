@@ -31,10 +31,39 @@ if %ERRORLEVEL% equ 0 (
     exit /b 1
 )
 
-:: 2. Build standalone EXE with PyInstaller
+:: 2. Build standalone EXE with PyInstaller (FIXED with hidden imports)
 echo.
 echo 2. Building new EXE...
-pyinstaller --onefile --windowed --name "%EXE_NAME%" main.py
+pyinstaller --onefile --windowed --name "%EXE_NAME%" ^
+    --hidden-import=imageio ^
+    --hidden-import=imageio_ffmpeg ^
+    --hidden-import=imageio.core ^
+    --hidden-import=imageio.plugins ^
+    --hidden-import=moviepy ^
+    --hidden-import=moviepy.editor ^
+    --hidden-import=moviepy.video ^
+    --hidden-import=moviepy.audio ^
+    --hidden-import=moviepy.video.tools ^
+    --hidden-import=moviepy.video.fx ^
+    --hidden-import=moviepy.video.tools.subtitles ^
+    --hidden-import=moviepy.audio.io ^
+    --hidden-import=moviepy.video.io ^
+    --hidden-import=moviepy.video.io.ffmpeg_reader ^
+    --hidden-import=moviepy.video.io.ffmpeg_writer ^
+    --hidden-import=moviepy.audio.io.ffmpeg_audiowriter ^
+    --hidden-import=numpy ^
+    --hidden-import=PIL ^
+    --hidden-import=PIL.Image ^
+    --hidden-import=PIL.ImageDraw ^
+    --hidden-import=PIL.ImageFont ^
+    --hidden-import=pkg_resources ^
+    --hidden-import=importlib.metadata ^
+    --hidden-import=importlib.resources ^
+    --collect-all=imageio ^
+    --collect-all=imageio_ffmpeg ^
+    --collect-all=moviepy ^
+    main.py
+
 if %ERRORLEVEL% equ 0 (
     echo [OK] EXE built: dist\%EXE_NAME%
 ) else (
