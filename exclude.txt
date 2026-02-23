@@ -1,0 +1,4 @@
+temp\
+output\
+__pycache__\
+*.log

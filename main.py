@@ -66,6 +66,7 @@ def main():
         english_text=english,
         headline=data["headline"],
         hook=data["hook_text"],
+        subscribe_hook=data["subscribe_hook"],
         output_path=output_path
     )
 

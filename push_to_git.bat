@@ -1,10 +1,12 @@
 @echo off
+setlocal EnableDelayedExpansion
+
 echo ============================================
 echo     GIT PUSH TO NEW REMOTE REPOSITORY
 echo ============================================
 
-REM ====== SET YOUR PROJECT DIRECTORY ======
-cd /d C:\PATH\TO\YOUR\PROJECT
+REM ====== USE CURRENT DIRECTORY AUTOMATICALLY ======
+cd /d %~dp0
 
 echo.
 echo Current Directory:
@@ -22,8 +24,16 @@ echo Adding all files...
 git add .
 
 echo.
+set /p commitmsg=Enter Commit Message: 
+
+REM If empty, set default message
+if "!commitmsg!"=="" (
+    set commitmsg=Auto Commit - %date% %time%
+)
+
+echo.
 echo Creating commit...
-git commit -m "Initial commit - Feb 23 Version 1"
+git commit -m "!commitmsg!"
 
 echo.
 echo Removing old remote (if exists)...

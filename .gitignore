@@ -21,3 +21,14 @@ __pycache__/
 # ============================
 venv/
 .env/
+
+temp/
+output/
+__pycache__/
+*.pyc
+*.log
+client_secrets.json
+
+dist/
+*.exe
+ShortsCreator_*.exe
