@@ -1,12 +1,3 @@
-"""Video composition for YouTube Shorts - 9:16 vertical format
-   - Header: only headline, small top bar, no overlap
-   - Subtitles: sentence-wise, scrolling, current sentence yellow
-   - Progress bar: visible filling bar
-   - Initial hook: big animated text at start
-   - Subscribe hook: end screen CTA
-   - Background music: low volume loop
-"""
-
 from moviepy.editor import (
     TextClip,
     CompositeVideoClip,
@@ -15,8 +6,7 @@ from moviepy.editor import (
     ColorClip,
     AudioFileClip,
     VideoClip,
-    vfx,
-    afx
+    CompositeAudioClip
 )
 
 from moviepy.video.tools.subtitles import SubtitlesClip
@@ -43,15 +33,21 @@ def make_short_video(
     output_dir = Path(output_path).parent
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # ───────────────────────────────────────────────
+    # AUDIO 1.2x SPEED (VERSION SAFE)
+    # ───────────────────────────────────────────────
     audio = AudioFileClip(audio_path)
-    duration = audio.duration
-    print(f"[DEBUG] Audio duration: {duration:.2f}s")
+    speed_factor = 1.2
+    original_duration = audio.duration
 
-    if duration < 5:
-        raise ValueError("Audio too short")
+    audio = audio.fl_time(lambda t: t * speed_factor, apply_to=['audio'])
+    audio = audio.set_duration(original_duration / speed_factor)
+
+    duration = audio.duration
+    print(f"[DEBUG] Audio duration after speed: {duration:.2f}s")
 
     # ───────────────────────────────────────────────
-    # Slideshow
+    # SLIDESHOW
     # ───────────────────────────────────────────────
     clips = []
     dur_per_img = duration / max(1, len(images))
@@ -66,61 +62,39 @@ def make_short_video(
             )
             clips.append(clip)
         except Exception:
-            black = (
+            clips.append(
                 ColorClip(
                     size=(config.VIDEO_WIDTH, config.VIDEO_HEIGHT),
                     color=(10, 10, 30)
-                )
-                .set_duration(dur_per_img)
+                ).set_duration(dur_per_img)
             )
-            clips.append(black)
 
     slideshow = concatenate_videoclips(clips, method="compose")
 
     # ───────────────────────────────────────────────
-    # Initial hook
+    # HEADER
     # ───────────────────────────────────────────────
-    initial_hook = TextClip(
-        hook,
-        fontsize=100,
-        color='yellow',
-        stroke_color='black',
-        stroke_width=6,
-        font='Arial-Bold',
-        size=(config.VIDEO_WIDTH - 100, None),
-        method='caption'
-    ).set_position('center').set_duration(5)
-
-    initial_hook = initial_hook.resize(lambda t: 1 + 0.15 * t)
-    initial_hook = initial_hook.set_opacity(1)
-
-    # ───────────────────────────────────────────────
-    # Header
-    # ───────────────────────────────────────────────
-    header_height = 100
-
     header_bg = (
-        ColorClip(size=(config.VIDEO_WIDTH, header_height), color=(0, 0, 0))
+        ColorClip(size=(config.VIDEO_WIDTH, 90), color=(0, 0, 0))
         .set_opacity(0.6)
         .set_duration(duration)
     )
 
     headline_clip = TextClip(
         headline,
-        fontsize=55,
+        fontsize=50,
         color='white',
         font='Arial-Bold',
-        size=(config.VIDEO_WIDTH - 100, None),
+        size=(config.VIDEO_WIDTH - 80, None),
         method='caption',
         align='center'
-    ).set_position(('center', 25)).set_duration(duration)
+    ).set_position(('center', 20)).set_duration(duration)
 
-    header = CompositeVideoClip(
-        [header_bg, headline_clip]
-    ).set_position(("center", "top"))
+    header = CompositeVideoClip([header_bg, headline_clip])\
+        .set_position(("center", "top"))
 
     # ───────────────────────────────────────────────
-    # Subtitles
+    # SUBTITLES (YELLOW ACTIVE STYLE)
     # ───────────────────────────────────────────────
     sentences = [s.strip() for s in english_text.split('\n') if s.strip()]
     if not sentences:
@@ -139,33 +113,31 @@ def make_short_video(
         return TextClip(
             txt,
             fontsize=60,
-            color='white',
+            color='yellow',
             stroke_color='black',
             stroke_width=3,
-            font='Arial',
+            font='Arial-Bold',
             size=(config.VIDEO_WIDTH - 120, None),
             method='caption',
             align='center'
         )
 
-    subtitle_clip = (
-        SubtitlesClip(subs, subtitle_maker)
-        .set_position(('center', config.VIDEO_HEIGHT - 250))
-    )
+    subtitle_clip = SubtitlesClip(subs, subtitle_maker)\
+        .set_position(('center', config.VIDEO_HEIGHT - 220))
 
     # ───────────────────────────────────────────────
-    # ✅ FIXED Progress Bar (No resize lambda)
+    # PROGRESS BAR (CLEAR & VISIBLE)
     # ───────────────────────────────────────────────
-    bar_height = 12
-    bar_y = config.VIDEO_HEIGHT - bar_height - 250
+    bar_height = 14
+    bar_y = config.VIDEO_HEIGHT - 40
 
     progress_bg = (
         ColorClip(
             size=(config.VIDEO_WIDTH, bar_height),
-            color=(80, 80, 80)
+            color=(60, 60, 60)
         )
         .set_duration(duration)
-        .set_position(("center", bar_y))
+        .set_position(("left", bar_y))
     )
 
     def make_progress_frame(t):
@@ -178,32 +150,46 @@ def make_short_video(
         )
 
         if width > 0:
-            frame[:, :width] = (220, 40, 40)
+            frame[:, :width] = (255, 0, 0)
 
         return frame
 
-    progress_fill = (
-        VideoClip(make_progress_frame, duration=duration)
+    progress_fill = VideoClip(make_progress_frame, duration=duration)\
         .set_position(("left", bar_y))
-    )
 
     # ───────────────────────────────────────────────
-    # Background music
+    # INITIAL HOOK
     # ───────────────────────────────────────────────
-    final_audio = audio
+    initial_hook = TextClip(
+        hook,
+        fontsize=90,
+        color='yellow',
+        stroke_color='black',
+        stroke_width=6,
+        font='Arial-Bold',
+        size=(config.VIDEO_WIDTH - 80, None),
+        method='caption'
+    ).set_position('center').set_duration(5)
 
+    initial_hook = initial_hook.resize(lambda t: 1 + 0.15 * t)
+
+    # ───────────────────────────────────────────────
+    # BACKGROUND MUSIC
+    # ───────────────────────────────────────────────
     try:
-        bg_music = AudioFileClip("background_music.mp3")
-        bg_music = bg_music.volumex(0.15).audio_loop(duration=duration)
-        final_audio = audio.volumex(1.0).audio_fadein(2).audio_fadeout(2)
-        final_audio = final_audio.set_duration(duration)
-        final_audio = final_audio.set_audio(bg_music)
+        bg_music = AudioFileClip("background_music.mp3")\
+            .volumex(0.15)\
+            .audio_loop(duration=duration)
+
+        final_audio = CompositeAudioClip([audio, bg_music])
         print("[INFO] Background music added")
+
     except Exception:
-        print("[INFO] No background_music.mp3 found → using voice only")
+        final_audio = audio
+        print("[INFO] No background_music.mp3 found")
 
     # ───────────────────────────────────────────────
-    # End screen
+    # END SCREEN
     # ───────────────────────────────────────────────
     end_duration = 5
     end_start = duration - end_duration
@@ -226,27 +212,21 @@ def make_short_video(
         method='caption'
     ).set_position('center').set_duration(end_duration)
 
-    end_screen = (
-        CompositeVideoClip([end_bg, subscribe_text])
+    end_screen = CompositeVideoClip([end_bg, subscribe_text])\
         .set_start(end_start)
-    )
 
     # ───────────────────────────────────────────────
-    # Final composition
+    # FINAL COMPOSITION
     # ───────────────────────────────────────────────
-    final_video = (
-        CompositeVideoClip([
-            slideshow,
-            header,
-            progress_bg,
-            progress_fill,
-            subtitle_clip,
-            initial_hook.set_duration(5),
-            end_screen
-        ])
-        .set_audio(audio)
-        .set_duration(duration)
-    )
+    final_video = CompositeVideoClip([
+        slideshow,
+        header,
+        subtitle_clip,
+        progress_bg,
+        progress_fill,
+        initial_hook,
+        end_screen
+    ]).set_audio(final_audio).set_duration(duration)
 
     print("[DEBUG] Writing final video...")
 
@@ -260,10 +240,6 @@ def make_short_video(
         logger=None
     )
 
-    total_time = time.time() - start_total
-    min_sec = divmod(total_time, 60)
-
     print(f"[SUCCESS] Video saved: {output_path}")
-    print(f"[TIMER] Total: {int(min_sec[0])} min {int(min_sec[1])} sec")
 
     return output_path
